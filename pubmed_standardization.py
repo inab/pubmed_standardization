@@ -6,7 +6,7 @@ import argparse
 import gzip
 import xml.etree.ElementTree as ET
 import json
-import xmltodict
+import xmltodict 
 
 DOCS_FOR_FOLDER=1000
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
 def Main(args):
     dest=args.o
-    result_file = dest + "/update_history.csv"
+    result_file = dest + "/index.csv"
     standardization_output = dest + "/standardization/"
     standardization_input = dest + "/retrieval/"
     if not os.path.exists(standardization_output):
@@ -48,7 +48,7 @@ def Main(args):
     standardization(df,standardization_input,standardization_output,result_file)
 
 def unzip(df,standardization_input,result_file):
-    df_=df.loc[df['operation'] == 'download']
+    df_=df.loc[df['retrieval'] == 'complete']
     for index, data in df_.iterrows():
         file=os.path.join(standardization_input+"/"+data['folder'], data['name'])
         xml_file_path = file + ".xml"
