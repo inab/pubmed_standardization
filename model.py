@@ -39,6 +39,7 @@ class PubMedArticle(Base):
     id = Column(Integer, Sequence('id'), primary_key=True)
     pmid = Column(String(100))
     filename = Column(String(250))
+    parent_filename = Column(String(250))
     json = Column(Integer)
     json_datetime = Column(String(250))
     json_path = Column(String(400))
@@ -46,13 +47,14 @@ class PubMedArticle(Base):
     txt_datetime = Column(String(250))
     txt_path = Column(String(400))
     def __repr__(self):
-        return "<PubMedArticle(pmid='%s', filename='%s', download='%s', download_datetime='%s',download_path='%s', txt='%s', txt_datetime='%s', txt_path='%s')>" % (
-                                self.pmid, self.filename, self.json, self.json_datetime, self.json_path, self.txt, self.txt_datetime, self.txt_path)
+        return "<PubMedArticle(pmid='%s', filename='%s',parent_filename='%s', download='%s', download_datetime='%s',download_path='%s', txt='%s', txt_datetime='%s', txt_path='%s')>" % (
+                                self.pmid, self.filename, self.parent_filename, self.json, self.json_datetime, self.json_path, self.txt, self.txt_datetime, self.txt_path)
     
     """Consctructor"""
-    def __init__(self,pmid,filename, json,json_datetime,json_path,txt, txt_datetime,txt_path):
+    def __init__(self,pmid,filename, parent_filename, json,json_datetime,json_path,txt, txt_datetime,txt_path):
         self.pmid = pmid
         self.filename = filename
+        self.parent_filename = parent_filename
         self.json = json
         self.json_datetime = json_datetime
         self.json_path = json_path

@@ -72,18 +72,22 @@ def unzip(standardization_input):
                        
 def standardization(standardization_input, standardization_output):
     dao = DAO()
+    old_unzip_path = None
     pubMedRetrievals = dao.findAllForStandardization(PubMedRetrieval)
     for pubMedRetrieval in pubMedRetrievals:
         workdir_input = standardization_input+"/"+pubMedRetrieval.unzip_path
         workdir_output = standardization_output+"/"+pubMedRetrieval.unzip_path
+        if(old_unzip_path!=workdir_output):
+            internal_folder_q = 0
+        old_unzip_path = workdir_output 
         if not os.path.exists(workdir_output):
             os.makedirs(workdir_output)
         file=os.path.join(workdir_input, pubMedRetrieval.filename)
         xml_file_path = file + ".xml"
         docs_quantity = DOCS_FOR_FOLDER
-        internal_folder_q = 0 
         if os.path.isfile(xml_file_path):
             with open(xml_file_path,'r') as xml_file:
+                print ("Parsing " + pubMedRetrieval.filename)
                 docXml = ET.parse(xml_file)
                 for article in docXml.findall("PubmedArticle"):
                     try:
@@ -96,24 +100,24 @@ def standardization(standardization_input, standardization_output):
                         print ("Processing pmid:" + pmid)
                         pubmedArticle = dao.findPubMedArticleByPMID(PubMedArticle,pmid)
                         if(pubmedArticle==None):
-                            pubmedArticle = PubMedArticle(pmid,"PMID"+pmid,'0','null','null','0','null','null')
+                            pubmedArticle = PubMedArticle(pmid,"PMID"+pmid, pubMedRetrieval.filename,'0','null','null','0','null','null')
                             dao.save(pubmedArticle) 
-                        xml_string = ET.tostring(article, encoding='utf-8', method='xml')
+                        '''xml_string = ET.tostring(article, encoding='utf-8', method='xml')
                         o = xmltodict.parse(xml_string, encoding='utf-8')
                         jsonString = json.dumps(o, indent=4)
                         json_file=open(internal_folder+"/PMID"+pmid+".json",'w')
                         json_file.write(jsonString)
                         json_file.flush()
-                        json_file.close()
+                        json_file.close()'''
                         pubmedArticle.json=1
                         pubmedArticle.json_path=pubMedRetrieval.unzip_path + "/" + str(internal_folder_q)
                         pubmedArticle.json_datetime=datetime.now()
                         dao.save(pubmedArticle) 
-                        txt = ET.tostring(article, encoding='utf-8', method='text')
+                        '''txt = ET.tostring(article, encoding='utf-8', method='text')
                         txt_file=open(internal_folder+"/PMID"+pmid+".txt",'w')
                         txt_file.write(txt)
                         txt_file.flush()
-                        txt_file.close()
+                        txt_file.close()'''
                         pubmedArticle.txt=1
                         pubmedArticle.txt_path=pubMedRetrieval.unzip_path + "/" + str(internal_folder_q)
                         pubmedArticle.txt_datetime=datetime.now()
