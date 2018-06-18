@@ -47,8 +47,8 @@ class PubMedArticle(Base):
     txt_datetime = Column(String(250))
     txt_path = Column(String(400))
     def __repr__(self):
-        return "<PubMedArticle(pmid='%s', filename='%s',parent_filename='%s', download='%s', download_datetime='%s',download_path='%s', txt='%s', txt_datetime='%s', txt_path='%s')>" % (
-                                self.pmid, self.filename, self.parent_filename, self.json, self.json_datetime, self.json_path, self.txt, self.txt_datetime, self.txt_path)
+        return "<PubMedArticle(pmid='%s', filename='%s',parent_filename='%s', json='%s', json_datetime='%s',json_path='%s', txt='%s', txt_datetime='%s', txt_path='%s')>" % (
+                        self.pmid, self.filename, self.parent_filename, self.json, self.json_datetime, self.json_path, self.txt, self.txt_datetime, self.txt_path)
     
     """Consctructor"""
     def __init__(self,pmid,filename, parent_filename, json,json_datetime,json_path,txt, txt_datetime,txt_path):

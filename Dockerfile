@@ -11,4 +11,4 @@ COPY . /app
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 # Run app.py when the container launches
-CMD ["python", "pubmed_standardization.py", "-p","config.properties"]
+#CMD ["python", "pubmed_standardization.py", "-p","config.properties"]

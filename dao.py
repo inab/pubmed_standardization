@@ -7,18 +7,6 @@ from sqlalchemy import exists
 from db_util import getSession
 from sqlalchemy import and_
 class DAO:
-    '''Singleton
-    instance = None
-    def __init__(self):
-        if not DAO.instance:
-            DAO.instance = DAO.__DAO()
-        DAO.instance
-    
-    def __getattr__(self, name):
-        return getattr(self.instance, name)
-    def __setattr__(self, name):
-        return setattr(self.instance, name)
-    ''' 
     def save(self, instance):
         session = getSession()
         try:
@@ -96,8 +84,7 @@ class DAO:
     def findPubMedArticleByPMID(self, model_class, pmid):
         session = getSession()
         try:
-            ret = session.query(model_class).\
-            filter(model_class.pmid == pmid).all()
+            ret = session.query(model_class).filter(model_class.pmid == pmid).all()
             if(len(ret)==0):
                 ret = None
             elif(len(ret)==1): 

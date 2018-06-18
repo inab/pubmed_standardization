@@ -13,7 +13,7 @@ from dao import DAO
 from model import PubMedRetrieval
 from model import PubMedArticle
 DOCS_FOR_FOLDER=1000
-
+import codecs
 parser=argparse.ArgumentParser()
 parser.add_argument('-o', help='Output Directory')
 parser.add_argument('-u', help='SQLITE Database URL')
@@ -36,15 +36,28 @@ def Main(parameters):
     standardization(standardization_input,standardization_output)
 
 def ReadParameters(args):
+    parameters_error=False
+    parameters_obligation=False
     if(args.p!=None):
         Config = ConfigParser.ConfigParser()
         Config.read(args.p)
         parameters['database_url']=Config.get('DATABASE', 'url')
         parameters['output_directory']=Config.get('MAIN', 'output')
+    else:
+        parameters_obligation=True
     if(args.u!=None):
         parameters['database_url']=args.u
+    elif (parameters_obligation):
+        print ("No database url provided")
+        parameters_error=True
     if(args.o!=None):
         parameters['output_directory']=args.o
+    elif (parameters_obligation):
+        print ("No output directory provided")
+        parameters_error=False
+    if(parameters_error):
+        print("Please send the correct parameters.  You can type for --help ")
+        sys.exit(1)
     return parameters
 
 def unzip(standardization_input):
@@ -83,9 +96,10 @@ def standardization(standardization_input, standardization_output):
         if not os.path.exists(workdir_output):
             os.makedirs(workdir_output)
         file=os.path.join(workdir_input, pubMedRetrieval.filename)
-        xml_file_path = file + ".xml"
+        xml_file_path = file + ".xml" 
         docs_quantity = DOCS_FOR_FOLDER
         if os.path.isfile(xml_file_path):
+        #if os.path.isfile("/home/jcorvi/text_mining_data_test/pubmed_data//retrieval//baseline/pubmed_result.xml"):
             with open(xml_file_path,'r') as xml_file:
                 print ("Parsing " + pubMedRetrieval.filename)
                 docXml = ET.parse(xml_file)
@@ -98,26 +112,32 @@ def standardization(standardization_input, standardization_output):
                                 os.makedirs(internal_folder)
                         pmid = article.find("MedlineCitation").find("PMID").text
                         print ("Processing pmid:" + pmid)
+                        
+                        
+                        
                         pubmedArticle = dao.findPubMedArticleByPMID(PubMedArticle,pmid)
                         if(pubmedArticle==None):
                             pubmedArticle = PubMedArticle(pmid,"PMID"+pmid, pubMedRetrieval.filename,'0','null','null','0','null','null')
                             dao.save(pubmedArticle) 
-                        '''xml_string = ET.tostring(article, encoding='utf-8', method='xml')
-                        o = xmltodict.parse(xml_string, encoding='utf-8')
-                        jsonString = json.dumps(o, indent=4)
-                        json_file=open(internal_folder+"/PMID"+pmid+".json",'w')
-                        json_file.write(jsonString)
-                        json_file.flush()
-                        json_file.close()'''
-                        pubmedArticle.json=1
-                        pubmedArticle.json_path=pubMedRetrieval.unzip_path + "/" + str(internal_folder_q)
-                        pubmedArticle.json_datetime=datetime.now()
-                        dao.save(pubmedArticle) 
-                        '''txt = ET.tostring(article, encoding='utf-8', method='text')
-                        txt_file=open(internal_folder+"/PMID"+pmid+".txt",'w')
-                        txt_file.write(txt)
+                        
+                            
+                        article_xml = article.find("MedlineCitation").find("Article")
+                        
+                        txt_file=codecs.open(internal_folder+"/PMID"+pmid+".txt",'w',encoding='utf8')
+                        title_xml=article_xml.find("ArticleTitle")
+                        if(title_xml!=None):
+                            title = title_xml.text
+                            txt_file.write('<TITLE_LIMTOX>.\n'+title+'\n')
+                        abstract_xml = article_xml.find("Abstract")
+                        if(abstract_xml!=None):
+                            abstract_text = abstract_xml.find("AbstractText")
+                            if(abstract_text!=None):
+                                abstract=abstract_text.text
+                                txt_file.write('<ABSTRACT_LIMTOX>.\n'+abstract)
+                                
+                        
                         txt_file.flush()
-                        txt_file.close()'''
+                        txt_file.close()
                         pubmedArticle.txt=1
                         pubmedArticle.txt_path=pubMedRetrieval.unzip_path + "/" + str(internal_folder_q)
                         pubmedArticle.txt_datetime=datetime.now()
