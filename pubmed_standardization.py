@@ -90,9 +90,11 @@ def standardization(standardization_input, standardization_output):
     for pubMedRetrieval in pubMedRetrievals:
         workdir_input = standardization_input+"/"+pubMedRetrieval.unzip_path
         workdir_output = standardization_output+"/"+pubMedRetrieval.unzip_path
-        if(old_unzip_path!=workdir_output):
+        dirs = os.listdir( workdir_output )
+        internal_folder_q = len(dirs) + 1
+        '''if(old_unzip_path!=workdir_output):
             internal_folder_q = 0
-        old_unzip_path = workdir_output 
+        old_unzip_path = workdir_output''' 
         if not os.path.exists(workdir_output):
             os.makedirs(workdir_output)
         file=os.path.join(workdir_input, pubMedRetrieval.filename)
@@ -105,46 +107,41 @@ def standardization(standardization_input, standardization_output):
                 docXml = ET.parse(xml_file)
                 for article in docXml.findall("PubmedArticle"):
                     try:
-                        if(docs_quantity==DOCS_FOR_FOLDER):
-                            internal_folder_q = internal_folder_q + 1
-                            internal_folder = workdir_output + "/" + str(internal_folder_q)
-                            if not os.path.exists(internal_folder):
-                                os.makedirs(internal_folder)
                         pmid = article.find("MedlineCitation").find("PMID").text
                         print ("Processing pmid:" + pmid)
                         
-                        
-                        
-                        pubmedArticle = dao.findPubMedArticleByPMID(PubMedArticle,pmid)
-                        if(pubmedArticle==None):
-                            pubmedArticle = PubMedArticle(pmid,"PMID"+pmid, pubMedRetrieval.filename,'0','null','null','0','null','null')
-                            dao.save(pubmedArticle) 
-                        
-                            
                         article_xml = article.find("MedlineCitation").find("Article")
-                        
-                        txt_file=codecs.open(internal_folder+"/PMID"+pmid+".txt",'w',encoding='utf8')
-                        title_xml=article_xml.find("ArticleTitle")
-                        if(title_xml!=None):
-                            title = title_xml.text
-                            txt_file.write('<TITLE_LIMTOX>.\n'+title+'\n')
                         abstract_xml = article_xml.find("Abstract")
                         if(abstract_xml!=None):
-                            abstract_text = abstract_xml.find("AbstractText")
-                            if(abstract_text!=None):
-                                abstract=abstract_text.text
-                                txt_file.write('<ABSTRACT_LIMTOX>.\n'+abstract)
-                                
-                        
-                        txt_file.flush()
-                        txt_file.close()
-                        pubmedArticle.txt=1
-                        pubmedArticle.txt_path=pubMedRetrieval.unzip_path + "/" + str(internal_folder_q)
-                        pubmedArticle.txt_datetime=datetime.now()
-                        dao.save(pubmedArticle) 
-                        docs_quantity = docs_quantity - 1
-                        if(docs_quantity==0):
-                            docs_quantity=DOCS_FOR_FOLDER
+                            pubmedArticle = dao.findPubMedArticleByPMID(PubMedArticle,pmid)
+                            if(pubmedArticle==None):
+                                pubmedArticle = PubMedArticle(pmid,"PMID"+pmid, pubMedRetrieval.filename,'0','null','null','0','null','null')
+                                dao.save(pubmedArticle) 
+                            if(docs_quantity==DOCS_FOR_FOLDER):
+                                internal_folder_q = internal_folder_q + 1
+                                internal_folder = workdir_output + "/" + str(internal_folder_q)
+                                if not os.path.exists(internal_folder):
+                                    os.makedirs(internal_folder)
+                            txt_file=codecs.open(internal_folder+"/PMID"+pmid+".txt",'w',encoding='utf8')
+                            title_xml=article_xml.find("ArticleTitle")
+                            if(title_xml!=None):
+                                title = title_xml.text
+                                txt_file.write('<TITLE_LIMTOX>.\n'+title+'\n')
+                            abstract_xml = article_xml.find("Abstract")
+                            if(abstract_xml!=None):
+                                abstract_text = abstract_xml.find("AbstractText")
+                                if(abstract_text!=None):
+                                    abstract=abstract_text.text
+                                    txt_file.write('<ABSTRACT_LIMTOX>.\n'+abstract)
+                            txt_file.flush()
+                            txt_file.close()    
+                            pubmedArticle.txt=1
+                            pubmedArticle.txt_path=pubMedRetrieval.unzip_path + "/" + str(internal_folder_q)
+                            pubmedArticle.txt_datetime=datetime.now()
+                            dao.save(pubmedArticle) 
+                            docs_quantity = docs_quantity - 1
+                            if(docs_quantity==0):
+                                docs_quantity=DOCS_FOR_FOLDER
                     except Exception as inst:
                         print "Error Generando el JSON/TXT PMID " + pmid
                         print inst

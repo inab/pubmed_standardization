@@ -19,12 +19,13 @@ class PubMedRetrieval(Base):
     unzip = Column(Integer)
     unzip_datetime = Column(String(250))
     unzip_path = Column(String(400))
+    articles_processed = Column(Integer)
     def __repr__(self):
-        return "<PubMedRetrieval(filename='%s', download='%s', download_datetime='%s',download_path='%s', unzip='%s', unzip_datetime='%s', unzip_path='%s')>" % (
-                                self.filename, self.download, self.download_datetime, self.download_path, self.unzip, self.unzip_datetime, self.unzip_path)
+        return "<PubMedRetrieval(filename='%s', download='%s', download_datetime='%s',download_path='%s', unzip='%s', unzip_datetime='%s', unzip_path='%s', articles_processed='%s')>" % (
+                                self.filename, self.download, self.download_datetime, self.download_path, self.unzip, self.unzip_datetime, self.unzip_path, self.articles_processed)
     
     """Consctructor"""
-    def __init__(self, filename, download,download_datetime,download_path,unzip, unzip_datetime,unzip_path):
+    def __init__(self, filename, download,download_datetime,download_path,unzip, unzip_datetime,unzip_path,articles_processed):
         self.filename = filename
         self.download = download
         self.download_datetime = download_datetime
@@ -32,7 +33,7 @@ class PubMedRetrieval(Base):
         self.unzip = unzip
         self.unzip_datetime = unzip_datetime
         self.unzip_path = unzip_path
-        
+        self.articles_processed = articles_processed
         
 class PubMedArticle(Base):
     __tablename__ = 'pubmed_articles'

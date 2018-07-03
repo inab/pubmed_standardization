@@ -72,7 +72,7 @@ class DAO:
         session = getSession()
         try:
             ret = session.query(model_class).\
-            filter(and_(model_class.download == '1', model_class.unzip == '1')).all()
+            filter(and_(model_class.download == '1', model_class.unzip == '1', model_class.articles_processed == '0')).all()
         except Exception as inst:
             print inst
             session.rollback()
