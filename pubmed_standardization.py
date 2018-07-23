@@ -12,7 +12,7 @@ import ConfigParser
 from dao import DAO
 from model import PubMedRetrieval
 from model import PubMedArticle
-DOCS_FOR_FOLDER=100
+DOCS_FOR_FOLDER=5000
 import codecs
 parser=argparse.ArgumentParser()
 parser.add_argument('-o', help='Output Directory')
