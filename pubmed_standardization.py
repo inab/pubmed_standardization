@@ -110,7 +110,6 @@ def standardization(standardization_input, standardization_output):
                     try:
                         pmid = article.find("MedlineCitation").find("PMID").text
                         print ("Processing pmid:" + pmid)
-                        
                         article_xml = article.find("MedlineCitation").find("Article")
                         abstract_xml = article_xml.find("Abstract")
                         if(abstract_xml!=None):
@@ -200,7 +199,6 @@ def standardization2(standardization_input, standardization_output):
                     try:
                         pmid = article.find("MedlineCitation").find("PMID").text
                         print ("Processing pmid:" + pmid)
-                        
                         article_xml = article.find("MedlineCitation").find("Article")
                         abstract_xml = article_xml.find("Abstract")
                         if(abstract_xml!=None):
@@ -220,13 +218,15 @@ def standardization2(standardization_input, standardization_output):
                             txt_file.write('<SECTIONS_LIMTOX>\n')
                             if(title_xml!=None):
                                 title = title_xml.text
-                                txt_file.write('<TITLE_LIMTOX>'+title+'</TITLE_LIMTOX>\n')
+                                if(title!=None):
+                                    txt_file.write('<TITLE_LIMTOX>'+title+'</TITLE_LIMTOX>\n')
                             abstract_xml = article_xml.find("Abstract")
                             if(abstract_xml!=None):
                                 abstract_text = abstract_xml.find("AbstractText")
                                 if(abstract_text!=None):
                                     abstract=abstract_text.text
-                                    txt_file.write('<ABSTRACT_LIMTOX>'+abstract+'</ABSTRACT_LIMTOX>\n')
+                                    if(abstract!=None):
+                                        txt_file.write('<ABSTRACT_LIMTOX>'+abstract+'</ABSTRACT_LIMTOX>\n')
                             txt_file.write('</SECTIONS_LIMTOX>\n')
                             txt_file.write('<KEYWORDS_LIMTOX>\n')
                             chemicalList = article.find("MedlineCitation").find("ChemicalList")        
