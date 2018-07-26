@@ -9,6 +9,7 @@ import json
 import xmltodict 
 from db_util import InitDataBase
 import ConfigParser
+import xml.sax.saxutils as saxutils
 from dao import DAO
 from model import PubMedRetrieval
 from model import PubMedArticle
@@ -171,7 +172,10 @@ def standardization(standardization_input, standardization_output):
                         print inst
                         x = inst.args
                         print x 
-
+        print "Finish  " + pubMedRetrieval 
+        pubMedRetrieval.articles_processed=1
+        dao.save(pubMedRetrieval) 
+    print  "Finish All "                    
 def standardization2(standardization_input, standardization_output):
     dao = DAO()
     old_unzip_path = None
@@ -219,14 +223,15 @@ def standardization2(standardization_input, standardization_output):
                             if(title_xml!=None):
                                 title = title_xml.text
                                 if(title!=None):
-                                    txt_file.write('<TITLE_LIMTOX>'+title+'</TITLE_LIMTOX>\n')
+                                    txt_file.write('<TITLE_LIMTOX>'+saxutils.escape(title)+'</TITLE_LIMTOX>\n')
                             abstract_xml = article_xml.find("Abstract")
                             if(abstract_xml!=None):
                                 abstract_text = abstract_xml.find("AbstractText")
                                 if(abstract_text!=None):
                                     abstract=abstract_text.text
                                     if(abstract!=None):
-                                        txt_file.write('<ABSTRACT_LIMTOX>'+abstract+'</ABSTRACT_LIMTOX>\n')
+                                        pubmedArticle.txt=1
+                                        txt_file.write('<ABSTRACT_LIMTOX>'+saxutils.escape(abstract)+'</ABSTRACT_LIMTOX>\n')
                             txt_file.write('</SECTIONS_LIMTOX>\n')
                             txt_file.write('<KEYWORDS_LIMTOX>\n')
                             chemicalList = article.find("MedlineCitation").find("ChemicalList")        
@@ -235,13 +240,13 @@ def standardization2(standardization_input, standardization_output):
                                 for chemical in chemicalList.findall("Chemical"):
                                     name_substance = chemical.find("NameOfSubstance")
                                     if(name_substance!=None):
-                                        txt_file.write("<CHEMICAL><NAME>"+name_substance.text+"</NAME>"+"<UI>"+name_substance.get('UI')+"</UI></CHEMICAL>"+'\n')
+                                        txt_file.write("<CHEMICAL><NAME>"+saxutils.escape(name_substance.text)+"</NAME>"+"<UI>"+name_substance.get('UI')+"</UI></CHEMICAL>"+'\n')
                                 txt_file.write('</KEYWORDS_MESHCHEMICAL_LIMTOX>\n')    
                             keyWords = article.find("MedlineCitation").find("KeywordList")        
                             if(keyWords!=None):
                                 txt_file.write('<KEYWORDS_MANUAL_LIMTOX>')
                                 for keyword in keyWords.findall("Keyword"):
-                                    txt_file.write("<NAME>"+keyword.text+"</NAME>"+'\n')
+                                    txt_file.write("<NAME>"+saxutils.escape(keyword.text)+"</NAME>"+'\n')
                                 txt_file.write('</KEYWORDS_MANUAL_LIMTOX>')   
                             meshs = article.find("MedlineCitation").find("MeshHeadingList")        
                             if(meshs!=None):
@@ -249,14 +254,14 @@ def standardization2(standardization_input, standardization_output):
                                 for mesh in meshs.findall("MeshHeading"):
                                     name_mesh = mesh.find("DescriptorName")
                                     if(name_mesh!=None):
-                                        txt_file.write("<NAME>"+name_mesh.text+"</NAME>"+'\n')
+                                        txt_file.write("<NAME>"+saxutils.escape(name_mesh.text)+"</NAME>"+'\n')
                                 txt_file.write('</KEYWORDS_MESH_LIMTOX>\n')        
                             txt_file.write('</KEYWORDS_LIMTOX>\n')            
                             txt_file.write('</ARTICLE_LIMTOX>\n')
                             
                             txt_file.flush()
                             txt_file.close()    
-                            pubmedArticle.txt=1
+                            
                             pubmedArticle.txt_path=pubMedRetrieval.unzip_path + "/" + str(internal_folder_q)
                             pubmedArticle.txt_datetime=datetime.now()
                             dao.save(pubmedArticle) 
@@ -268,6 +273,8 @@ def standardization2(standardization_input, standardization_output):
                         print inst
                         x = inst.args
                         print x 
-
-                        
+        print "Finish  " + xml_file_path 
+        pubMedRetrieval.articles_processed=1
+        dao.save(pubMedRetrieval) 
+    print  "Finish All "                     
                                 
