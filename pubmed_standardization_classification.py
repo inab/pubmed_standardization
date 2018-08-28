@@ -61,7 +61,7 @@ def unzip(standardization_input):
         subs = [os.path.join(standardization_input, f) for f in os.listdir(standardization_input) if os.path.isdir(os.path.join(standardization_input, f))]
         for sub in subs:
             onlyfiles = [os.path.join(os.path.join(sub, f)) for f in os.listdir(sub) if (os.path.isfile(os.path.join(sub, f)) & f.endswith('.xml.gz') & (os.path.basename(f) not in ids_list))]
-        pubMedRetrievals = pubMedRetrievals + onlyfiles   
+            pubMedRetrievals = pubMedRetrievals + onlyfiles   
     with open(standardization_input+"/list_files_unziped.txt",'a') as list_files_unziped:
         for pubMedRetrieval in pubMedRetrievals:
             file=pubMedRetrieval
@@ -94,7 +94,7 @@ def standardization(standardization_input, standardization_output):
         subs = [os.path.join(standardization_input, f) for f in os.listdir(standardization_input) if os.path.isdir(os.path.join(standardization_input, f))]
         for sub in subs:
             onlyfiles = [os.path.join(sub, f) for f in os.listdir(sub) if (os.path.isfile(os.path.join(sub, f)) & f.endswith('.xml') & (os.path.basename(f) not in ids_list))]
-        pubMedRetrievals = pubMedRetrievals + onlyfiles
+            pubMedRetrievals = pubMedRetrievals + onlyfiles
     with open(standardization_output+"/list_files_standardized.txt",'a') as list_files_standardized:
         for pubMedRetrieval in pubMedRetrievals:
             if not os.path.exists(standardization_output):
