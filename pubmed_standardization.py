@@ -110,26 +110,26 @@ def standardization(standardization_input, standardization_output):
                         for article in docXml.findall("PubmedArticle"):
                             try:
                                 pmid = article.find("MedlineCitation").find("PMID").text
-                                art_txt = pmid + "\t"    
+                                art_txt = pmid + "\t" + 'ABSTRACT' + "\t"
                                 article_xml = article.find("MedlineCitation").find("Article")
                                 abstract_xml = article_xml.find("Abstract")
                                 if(abstract_xml!=None):
                                     title_xml=article_xml.find("ArticleTitle")
-                                    if(title_xml!=None):
-                                        title = title_xml.text
-                                        if(title!=None):
-                                            art_txt = art_txt + title.replace("\n"," ").replace("\t"," ").replace("\r"," ") + "\t" 
-                                        else:
-                                            art_txt = art_txt + " " + "\t"     
-                                        abstract_xml = article_xml.find("Abstract")
-                                        if(abstract_xml!=None):
-                                            abstract_text = abstract_xml.find("AbstractText")
-                                            if(abstract_text!=None):
-                                                abstract=abstract_text.text
-                                                if(abstract!=None):
-                                                    art_txt = art_txt + abstract.replace("\n"," ").replace("\t"," ").replace("\r"," ") + "\n" 
-                                                    txt_file.write(art_txt)
-                                                    txt_file.flush()
+                                    title = readTitle(title_xml)
+                                    if(title!=""):
+                                        art_txt = art_txt + remove_invalid_characters(title) + "\t" 
+                                    else:
+                                        art_txt = art_txt + " " + "\t"     
+                                    abstract_xml = article_xml.find("Abstract")
+                                    abstract = readAbstract(abstract_xml)
+                                    art_txt = art_txt + remove_invalid_characters(abstract) + "\n"
+                                    data=art_txt.split('\t')
+                                    if(len(data)==4):
+                                        txt_file.write(art_txt)
+                                        txt_file.flush()
+                                    else:
+                                        logging.error("Error Downloading  " + pmid + ". The document does not have a well tabulation format. The line: ")
+                                        logging.error(art_txt)
                             except Exception as inst:
                                 logging.error("Error generation data set for classification " + pmid)
                         txt_file.flush()                     
@@ -140,5 +140,50 @@ def standardization(standardization_input, standardization_output):
                 list_files_standardized.flush()
     list_files_standardized.close()   
     logging.info("Standardization End")
-                        
+
+
+def remove_invalid_characters(text):
+    text = text.replace("\n"," ").replace("\t"," ").replace("\r"," ")    
+    return text
+
+def readTitle(title_xml):
+    if(title_xml!=None):
+        title=''.join(itertext_title(title_xml))
+        return title
+    return ''
+def readAbstract(abstract_xml):
+    if(abstract_xml!=None):
+        abstract = ''.join(itertext_abstract(abstract_xml))
+        return abstract 
+    return ''
+def itertext_title(self):
+    tag = self.tag
+    if not isinstance(tag, str) and tag is not None:
+        return
+    if self.text:
+        yield self.text.strip()
+    for e in self:
+        for s in e.itertext():
+            yield s.strip()
+        if e.tail:
+            yield e.tail.strip()
+            
+def itertext_abstract(self):
+    tag = self.tag
+    if not isinstance(tag, str) and tag is not None:
+        return
+    if self.text:
+        yield self.text.strip()
+        for e in self:
+            tag2=e.tag
+            if isinstance(tag2, str) and tag2 is not None and tag2 in ['AbstractText']: 
+                for s in e.itertext():
+                    yield s.strip()
+                if e.tail:
+                    yield e.tail.strip()
+            elif tag2 not in ['CopyrightInformation']:
+                print tag2        
+    else:
+        print "no text review warning"    
+                      
                                 
