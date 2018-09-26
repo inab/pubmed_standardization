@@ -108,12 +108,13 @@ def standardization(standardization_input, standardization_output):
                         logging.info("Parsing: " + xml_file_path)
                         docXml = ET.parse(xml_file)
                         for article in docXml.findall("PubmedArticle"):
-                            try:
+                            try:#next fix to do, hay documentos con abstract vacio que esta saliendo .... 
                                 pmid = article.find("MedlineCitation").find("PMID").text
-                                art_txt = pmid + "\t" + 'ABSTRACT' + "\t"
+                                art_txt = pmid + "\t" + 'PUBMED' + "\t" + 'ABSTRACT' + "\t"
                                 article_xml = article.find("MedlineCitation").find("Article")
                                 abstract_xml = article_xml.find("Abstract")
-                                if(abstract_xml!=None):
+                                abstract = readAbstract(abstract_xml)
+                                if(abstract!=''):
                                     title_xml=article_xml.find("ArticleTitle")
                                     title = readTitle(title_xml)
                                     if(title!=""):
@@ -121,10 +122,9 @@ def standardization(standardization_input, standardization_output):
                                     else:
                                         art_txt = art_txt + " " + "\t"     
                                     abstract_xml = article_xml.find("Abstract")
-                                    abstract = readAbstract(abstract_xml)
                                     art_txt = art_txt + remove_invalid_characters(abstract) + "\n"
                                     data=art_txt.split('\t')
-                                    if(len(data)==4):
+                                    if(len(data)==5):
                                         txt_file.write(art_txt)
                                         txt_file.flush()
                                     else:
